@@ -340,6 +340,46 @@ class ConfigurationSpec extends ObjectBehavior
         $this->getArguments($defaultArguments)->shouldReturn($arguments);
     }
 
+    function it_has_provider_service_parameter(Parameters $parameters)
+    {
+        $parameters->get('provider', array())->willReturn(array());
+        $this->getProviderService()->shouldReturn('sylius.repository.product');
+
+        $parameters->get('provider')->willReturn(array('service' => 'sylius.provider.product'));
+        $this->getProviderService()->shouldReturn('sylius.provider.product');
+    }
+
+    function it_has_provider_method_parameter(Parameters $parameters)
+    {
+        $parameters->get('provider', array('method' => 'myDefaultMethod'))
+            ->willReturn(array('method' => 'myDefaultMethod'));
+        $this->getProviderMethod('myDefaultMethod')->shouldReturn('myDefaultMethod');
+
+        $parameters->get('provider', array('method' => 'myDefaultMethod'))
+            ->willReturn('myMethod');
+        $this->getProviderMethod('myDefaultMethod')->shouldReturn('myMethod');
+    }
+
+    function it_has_provider_arguments_parameter(Parameters $parameters)
+    {
+        $defaultArguments = array('arguments' => 'value');
+        $parameters->get('provider', array())->willReturn($defaultArguments);
+        $this->getProviderArguments($defaultArguments)->shouldReturn('value');
+
+        $arguments = array('arguments' => 'myValue');
+        $parameters->get('provider', array())->willReturn($arguments);
+        $this->getProviderArguments($defaultArguments)->shouldReturn('myValue');
+    }
+
+    function it_has_factory_service_parameter(Parameters $parameters)
+    {
+        $parameters->get('factory', array())->willReturn(array());
+        $this->getFactoryService()->shouldReturn('sylius.repository.product');
+
+        $parameters->get('factory')->willReturn(array('service' => 'sylius.factory.product'));
+        $this->getFactoryService()->shouldReturn('sylius.factory.product');
+    }
+
     function it_has_factory_method_parameter(Parameters $parameters)
     {
         $parameters->get('factory', array('method' => 'myDefaultMethod'))

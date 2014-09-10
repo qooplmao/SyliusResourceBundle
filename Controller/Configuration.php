@@ -269,21 +269,57 @@ class Configuration
         return $sorting;
     }
 
+    public function getProviderService()
+    {
+        $provider = $this->parameters->get('provider', array());
+
+        return isset($provider['service']) ? $provider['service'] : $this->getServiceName('repository');
+    }
+
     public function getMethod($default)
     {
+        return $this->getProviderMethod($default);
+    }
+
+    public function getProviderMethod($default)
+    {
+        $provider = $this->parameters->get('provider', array());
+
+        if (isset($provider['service'])) {
+            return $provider['service'];
+        }
+
         return $this->parameters->get('method', $default);
     }
 
     public function getArguments(array $default = array())
     {
+        return $this->getProviderArguments($default);
+    }
+
+    public function getProviderArguments(array $default = array())
+    {
+        $provider = $this->parameters->get('provider', array());
+
+        if (isset($provider['arguments'])) {
+            return $provider['arguments'];
+        }
+
         return $this->parameters->get('arguments', $default);
+    }
+
+    public function getFactoryService()
+    {
+        $factory = $this->parameters->get('factory', array());
+
+        return isset($factory['service']) ? $factory['service'] : $this->getServiceName('repository');
     }
 
     public function getFactoryMethod($default)
     {
-        $factory = $this->parameters->get('factory', array('method' => $default));
+        $factory = $this->parameters->get('factory', array());
 
-        return is_array($factory) ? $factory['method'] : $factory;
+        return isset($factory['method']) ? $factory['method'] : $default;
     }
 
     public function getFactoryArguments(array $default = array())

@@ -123,11 +123,11 @@ class ResourceController extends FOSRestController
         $criteria = $this->config->getCriteria();
         $sorting = $this->config->getSorting();
 
-        $repository = $this->getRepository();
+        $provider = $this->getProviderService();
 
         if ($this->config->isPaginated()) {
             $resources = $this->resourceResolver->getResource(
-                $repository,
+                $provider,
                 'createPaginator',
                 array($criteria, $sorting)
             );
@@ -145,7 +145,7 @@ class ResourceController extends FOSRestController
             }
         } else {
             $resources = $this->resourceResolver->getResource(
-                $repository,
+                $provider,
                 'findBy',
                 array($criteria, $sorting, $this->config->getLimit())
             );
@@ -314,7 +314,7 @@ class ResourceController extends FOSRestController
      */
     public function createNew()
     {
-        return $this->resourceResolver->createResource($this->getRepository(), 'createNew');
+        return $this->resourceResolver->createResource($this->getFactoryService(), 'createNew');
     }
 
     /**
@@ -352,7 +352,7 @@ class ResourceController extends FOSRestController
         $criteria = array_merge($default, $criteria);
 
         if (!$resource = $this->resourceResolver->getResource(
-            $this->getRepository(),
+            $this->getProviderService(),
             'findOneBy',
             array($this->config->getCriteria($criteria)))
         ) {
@@ -374,6 +374,22 @@ class ResourceController extends FOSRestController
     public function getRepository()
     {
         return $this->get($this->config->getServiceName('repository'));
+    }
+
+    /**
+     * @return object
+     */
+    public function getProviderService()
+    {
+        return $this->get($this->config->getProviderService());
+    }
+
+    /**
+     * @return object
+     */
+    public function getFactoryService()
+    {
+        return $this->get($this->config->getFactoryService());
     }
 
     /**
