@@ -16,6 +16,7 @@ use Sylius\Component\Resource\Exception\Driver\InvalidDriverException;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -154,12 +155,12 @@ abstract class AbstractResourceExtension extends Extension
      * Load bundle driver.
      *
      * @param array                 $config
-     * @param XmlFileLoader         $loader
+     * @param LoaderInterface       $loader
      * @param null|ContainerBuilder $container
      *
      * @throws InvalidDriverException
      */
-    protected function loadDatabaseDriver(array $config, XmlFileLoader $loader, ContainerBuilder $container)
+    protected function loadDatabaseDriver(array $config, LoaderInterface $loader, ContainerBuilder $container)
     {
         $bundle = str_replace(array('Extension', 'DependencyInjection\\'), array('Bundle', ''), get_class($this));
         $driver = $config['driver'];
@@ -187,10 +188,10 @@ abstract class AbstractResourceExtension extends Extension
     }
 
     /**
-     * @param array         $config
-     * @param XmlFileLoader $loader
+     * @param array             $config
+     * @param LoaderInterface   $loader
      */
-    protected function loadConfigurationFile(array $config, XmlFileLoader $loader)
+    protected function loadConfigurationFile(array $config, LoaderInterface $loader)
     {
         foreach ($config as $filename) {
             if (file_exists($file = sprintf('%s/%s.xml', $this->getConfigurationDirectory(), $filename))) {
