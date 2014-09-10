@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
@@ -65,7 +66,7 @@ abstract class AbstractResourceExtension extends Extension
 
         $config = $this->process($config, $container);
 
-        $loader = new XmlFileLoader($container, new FileLocator($this->getConfigurationDirectory()));
+        $loader = $this->getLoader($container);
 
         $this->loadConfigurationFile($this->configFiles, $loader);
 
@@ -90,6 +91,27 @@ abstract class AbstractResourceExtension extends Extension
         $container->setParameter('sylius.config.classes', $classes);
 
         return array($config, $loader);
+    }
+
+    /**
+     * Get loader
+     *
+     * @param ContainerBuilder $container
+     * @return YamlFileLoader|XmlFileLoader
+     * @throws \InvalidArgumentException
+     */
+    protected function getLoader(ContainerBuilder $container)
+    {
+        $loader = $container->getParameter('sylius.config.loader');
+        $fileLocator = new FileLocator($this->getConfigurationDirectory());
+
+        if ('xml' === $loader) {
+            return new XmlFileLoader($container, $fileLocator);
+        } elseif ('yaml' === $loader) {
+            return new YamlFileLoader($container, $fileLocator);
+        } else {
+            throw new \InvalidArgumentException(sprintf('Loader "%s" not in list of available loaders: xml, yaml', $loader));
+        }
     }
 
     /**

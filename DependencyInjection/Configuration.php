@@ -33,6 +33,18 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('sylius_resource');
 
+        $rootNode
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->scalarNode('loader')
+                    ->isRequired()
+                    ->validate()
+                    ->ifNotInArray(array('xml', 'yaml'))
+                        ->thenInvalid('Invalid loader "%s"')
+                    ->end()
+                ->end()
+            ->end();
+
         $this->addResourcesSection($rootNode);
         $this->addSettingsSection($rootNode);
 
