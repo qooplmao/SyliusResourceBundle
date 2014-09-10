@@ -27,8 +27,8 @@ class ResourceResolverSpec extends ObjectBehavior
         RepositoryInterface $repository,
         $configuration
     ) {
-        $configuration->getMethod('findBy')->willReturn('findAll');
-        $configuration->getArguments(array())->willReturn(array(5));
+        $configuration->getProviderMethod('findBy')->willReturn('findAll');
+        $configuration->getProviderArguments(array())->willReturn(array(5));
 
         $repository->findAll(5)->shouldBeCalled()->willReturn(array('foo', 'bar'));
 

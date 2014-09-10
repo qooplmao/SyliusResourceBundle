@@ -319,6 +319,7 @@ class ConfigurationSpec extends ObjectBehavior
 
     function it_has_method_parameter(Parameters $parameters)
     {
+        $parameters->get('provider', array())->willReturn(array());
         $parameters->get('method', 'myMethod')->willReturn('myMethod');
         $this->getMethod('myMethod')->shouldReturn('myMethod');
 
@@ -328,6 +329,7 @@ class ConfigurationSpec extends ObjectBehavior
 
     function it_has_arguments_parameter(Parameters $parameters)
     {
+        $parameters->get('provider', array())->willReturn(array());
         $defaultArguments = array('property' => 'value');
         $parameters->get('arguments', array())->willReturn(array());
         $this->getArguments()->shouldReturn(array());
@@ -345,18 +347,18 @@ class ConfigurationSpec extends ObjectBehavior
         $parameters->get('provider', array())->willReturn(array());
         $this->getProviderService()->shouldReturn('sylius.repository.product');
 
-        $parameters->get('provider')->willReturn(array('service' => 'sylius.provider.product'));
+        $parameters->get('provider', array())->willReturn(array('service' => 'sylius.provider.product'));
         $this->getProviderService()->shouldReturn('sylius.provider.product');
     }
 
     function it_has_provider_method_parameter(Parameters $parameters)
     {
-        $parameters->get('provider', array('method' => 'myDefaultMethod'))
+        $parameters->get('provider', array())
             ->willReturn(array('method' => 'myDefaultMethod'));
         $this->getProviderMethod('myDefaultMethod')->shouldReturn('myDefaultMethod');
 
-        $parameters->get('provider', array('method' => 'myDefaultMethod'))
-            ->willReturn('myMethod');
+        $parameters->get('provider', array())
+            ->willReturn(array('method' => 'myMethod'));
         $this->getProviderMethod('myDefaultMethod')->shouldReturn('myMethod');
     }
 
@@ -376,18 +378,18 @@ class ConfigurationSpec extends ObjectBehavior
         $parameters->get('factory', array())->willReturn(array());
         $this->getFactoryService()->shouldReturn('sylius.repository.product');
 
-        $parameters->get('factory')->willReturn(array('service' => 'sylius.factory.product'));
+        $parameters->get('factory', array())->willReturn(array('service' => 'sylius.factory.product'));
         $this->getFactoryService()->shouldReturn('sylius.factory.product');
     }
 
     function it_has_factory_method_parameter(Parameters $parameters)
     {
-        $parameters->get('factory', array('method' => 'myDefaultMethod'))
+        $parameters->get('factory', array())
             ->willReturn(array('method' => 'myDefaultMethod'));
         $this->getFactoryMethod('myDefaultMethod')->shouldReturn('myDefaultMethod');
 
-        $parameters->get('factory', array('method' => 'myDefaultMethod'))
-            ->willReturn('myMethod');
+        $parameters->get('factory', array())
+            ->willReturn(array('method' => 'myMethod'));
         $this->getFactoryMethod('myDefaultMethod')->shouldReturn('myMethod');
     }
 

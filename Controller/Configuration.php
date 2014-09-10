@@ -285,8 +285,8 @@ class Configuration
     {
         $provider = $this->parameters->get('provider', array());
 
-        if (isset($provider['service'])) {
-            return $provider['service'];
+        if (isset($provider['method'])) {
+            return $provider['method'];
         }
 
         return $this->parameters->get('method', $default);
