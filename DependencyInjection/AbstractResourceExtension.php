@@ -66,7 +66,7 @@ abstract class AbstractResourceExtension extends Extension
 
         $config = $this->process($config, $container);
 
-        $loader = $this->getLoader($container);
+        $loader = $this->getLoader($container, $config['loader']);
 
         $this->loadConfigurationFile($this->configFiles, $loader);
 
@@ -96,13 +96,13 @@ abstract class AbstractResourceExtension extends Extension
     /**
      * Get loader
      *
-     * @param ContainerBuilder $container
+     * @param ContainerBuilder                  $container
+     * @param string                            $loader
      * @return YamlFileLoader|XmlFileLoader
      * @throws \InvalidArgumentException
      */
-    protected function getLoader(ContainerBuilder $container)
+    protected function getLoader(ContainerBuilder $container, $loader)
     {
-        $loader = $container->getParameter('sylius.config.loader');
         $fileLocator = new FileLocator($this->getConfigurationDirectory());
 
         if ('xml' === $loader) {
