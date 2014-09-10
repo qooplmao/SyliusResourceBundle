@@ -48,8 +48,6 @@ class SyliusResourceExtension extends Extension
         }
 
         $container->setParameter('sylius.config.classes', $classes);
-
-        $container->setParameter('sylius.config.loader', $config['loader']);
     }
 
     /**
