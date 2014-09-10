@@ -12,6 +12,7 @@
 namespace Sylius\Bundle\ResourceBundle\DependencyInjection;
 
 use Sylius\Bundle\ResourceBundle\DependencyInjection\Driver\DatabaseDriverFactory;
+use Sylius\Bundle\ResourceBundle\SyliusResourceBundle;
 use Sylius\Component\Resource\Exception\Driver\InvalidDriverException;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
@@ -69,7 +70,7 @@ abstract class AbstractResourceExtension extends Extension
 
         $loader = $this->getLoader($container, $config['loader']);
 
-        $this->loadConfigurationFile($this->configFiles, $loader);
+        $this->loadConfigurationFile($this->configFiles, $loader, $config['loader']);
 
         if ($configure & self::CONFIGURE_DATABASE) {
             $this->loadDatabaseDriver($config, $loader, $container);
@@ -106,12 +107,16 @@ abstract class AbstractResourceExtension extends Extension
     {
         $fileLocator = new FileLocator($this->getConfigurationDirectory());
 
-        if ('xml' === $loader) {
+        if (SyliusResourceBundle::MAPPING_XML === $loader) {
             return new XmlFileLoader($container, $fileLocator);
-        } elseif ('yaml' === $loader) {
+        } elseif (SyliusResourceBundle::MAPPING_YAML === $loader) {
             return new YamlFileLoader($container, $fileLocator);
         } else {
-            throw new \InvalidArgumentException(sprintf('Loader "%s" not in list of available loaders: xml, yaml', $loader));
+            throw new \InvalidArgumentException(sprintf(
+                'Loader "%s" not in list of available loaders: %s',
+                $loader,
+                json_encode(array(SyliusResourceBundle::MAPPING_XML, SyliusResourceBundle::MAPPING_YAML))
+            ));
         }
     }
 
@@ -169,7 +174,7 @@ abstract class AbstractResourceExtension extends Extension
             throw new InvalidDriverException($driver, basename($bundle));
         }
 
-        $this->loadConfigurationFile(array(sprintf('driver/%s', $driver)), $loader);
+        $this->loadConfigurationFile(array(sprintf('driver/%s', $driver)), $loader, $config['loader']);
 
         $container->setParameter($this->getAlias().'.driver', $driver);
         $container->setParameter($this->getAlias().'.driver.'.$driver, true);
@@ -190,11 +195,12 @@ abstract class AbstractResourceExtension extends Extension
     /**
      * @param array             $config
      * @param LoaderInterface   $loader
+     * @param string            $fileType
      */
-    protected function loadConfigurationFile(array $config, LoaderInterface $loader)
+    protected function loadConfigurationFile(array $config, LoaderInterface $loader, $fileType)
     {
         foreach ($config as $filename) {
-            if (file_exists($file = sprintf('%s/%s.xml', $this->getConfigurationDirectory(), $filename))) {
+            if (file_exists($file = sprintf('%s/%s.%s', $this->getConfigurationDirectory(), $filename, $fileType))) {
                 $loader->load($file);
             }
         }

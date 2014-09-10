@@ -41,14 +41,18 @@ abstract class AbstractResourceBundle extends Bundle implements ResourceBundleIn
         if (null !== $this->getModelNamespace()) {
             $className = get_class($this);
             foreach ($className::getSupportedDrivers() as $driver) {
-                list($mappingsPassClassName, $manager) = $this->getXmlMappingDriverInfo($driver);
+                list($mappingsPassClassName, $manager) = $this->getMappingDriverInfo($driver);
 
                 if (class_exists($mappingsPassClassName)) {
-                    $container->addCompilerPass($mappingsPassClassName::createXmlMappingDriver(
-                        array($this->getConfigFilesPath() => $this->getModelNamespace()),
-                        $manager,
-                        sprintf('%s.driver.%s', $this->getBundlePrefix(), $driver)
-                    ));
+                    $mappingPassMethodName = $this->getMappingPassMethodName();
+
+                    $container->addCompilerPass(
+                        $mappingsPassClassName::$mappingPassMethodName(
+                            array($this->getConfigFilesPath() => $this->getModelNamespace()),
+                            $manager,
+                            sprintf('%s.driver.%s', $this->getBundlePrefix(), $driver)
+                        )
+                    );
                 }
             }
         }
@@ -92,7 +96,18 @@ abstract class AbstractResourceBundle extends Bundle implements ResourceBundleIn
     }
 
     /**
-     * Return informations used to initialize XML mapping driver
+     * Return model mapping file type
+     *
+     *
+     * @return string
+     */
+    protected function getMappingFileType()
+    {
+        return self::XML_MAPPING;
+    }
+
+    /**
+     * Return informations used to initialize mapping driver
      *
      * @param string $driverType
      *
@@ -100,7 +115,7 @@ abstract class AbstractResourceBundle extends Bundle implements ResourceBundleIn
      *
      * @throws UnknownDriverException
      */
-    protected function getXmlMappingDriverInfo($driverType)
+    protected function getMappingDriverInfo($driverType)
     {
         switch ($driverType) {
             case SyliusResourceBundle::DRIVER_DOCTRINE_MONGODB_ODM:
@@ -121,6 +136,29 @@ abstract class AbstractResourceBundle extends Bundle implements ResourceBundleIn
         }
 
         throw new UnknownDriverException($driverType);
+    }
+
+    /**
+     * Return mapping pass method name
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    protected function getMappingPassMethodName()
+    {
+        if (SyliusResourceBundle::MAPPING_XML === $this->getMappingFileType()) {
+            $mappingPassMethodName = 'createXmlMappingDriver';
+        } elseif (SyliusResourceBundle::MAPPING_YAML === $this->getMappingFileType()) {
+            $mappingPassMethodName = 'createYamlMappingDriver';
+        } else {
+            throw new \InvalidArgumentException(sprintf(
+                'MappingFileType "%s" not in list of available types: %s',
+                $this->getMappingFileType(),
+                json_encode(array(SyliusResourceBundle::MAPPING_XML, SyliusResourceBundle::MAPPING_YAML))
+            ));
+        }
+
+        return $mappingPassMethodName;
     }
 
     /**
