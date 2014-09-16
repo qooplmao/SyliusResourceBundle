@@ -202,6 +202,8 @@ abstract class AbstractResourceExtension extends Extension
         foreach ($config as $filename) {
             if (file_exists($file = sprintf('%s/%s.%s', $this->getConfigurationDirectory(), $filename, $fileType))) {
                 $loader->load($file);
+            } elseif (file_exists($file = sprintf('%s/services/%s.%s', $this->getConfigurationDirectory(), $filename, $fileType))) {
+                $loader->load($file);
             }
         }
     }
