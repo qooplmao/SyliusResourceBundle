@@ -107,15 +107,15 @@ abstract class AbstractResourceExtension extends Extension
     {
         $fileLocator = new FileLocator($this->getConfigurationDirectory());
 
-        if (SyliusResourceBundle::MAPPING_XML === $loader) {
+        if (SyliusResourceBundle::SERVICES_XML === $loader) {
             return new XmlFileLoader($container, $fileLocator);
-        } elseif (SyliusResourceBundle::MAPPING_YAML === $loader) {
+        } elseif (SyliusResourceBundle::SERVICES_YAML === $loader) {
             return new YamlFileLoader($container, $fileLocator);
         } else {
             throw new \InvalidArgumentException(sprintf(
                 'Loader "%s" not in list of available loaders: %s',
                 $loader,
-                json_encode(array(SyliusResourceBundle::MAPPING_XML, SyliusResourceBundle::MAPPING_YAML))
+                json_encode(array(SyliusResourceBundle::SERVICES_XML, SyliusResourceBundle::SERVICES_YAML))
             ));
         }
     }

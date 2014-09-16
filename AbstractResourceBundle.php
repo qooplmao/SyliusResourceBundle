@@ -98,12 +98,21 @@ abstract class AbstractResourceBundle extends Bundle implements ResourceBundleIn
     /**
      * Return model mapping file type
      *
-     *
      * @return string
      */
     protected function getMappingFileType()
     {
-        return self::XML_MAPPING;
+        return SyliusResourceBundle::MAPPING_XML;
+    }
+
+    /**
+     * Return services file type
+     *
+     * @return string
+     */
+    protected function getServicesFileType()
+    {
+        return SyliusResourceBundle::SERVICES_XML;
     }
 
     /**

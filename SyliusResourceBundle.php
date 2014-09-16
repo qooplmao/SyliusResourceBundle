@@ -27,8 +27,12 @@ class SyliusResourceBundle extends Bundle
     const DRIVER_DOCTRINE_MONGODB_ODM   = 'doctrine/mongodb-odm';
     const DRIVER_DOCTRINE_PHPCR_ODM     = 'doctrine/phpcr-odm';
 
+    const MAPPING_ANNOTATION            = 'annotation';
     const MAPPING_XML                   = 'xml';
-    const MAPPING_YAML                  = 'yml';
+    const MAPPING_YAML                  = 'yaml';
+
+    const SERVICES_XML                  = 'xml';
+    const SERVICES_YAML                 = 'yml';
 
     /**
      * {@inheritdoc}
