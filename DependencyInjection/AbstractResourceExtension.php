@@ -36,6 +36,7 @@ abstract class AbstractResourceExtension extends Extension
     const CONFIGURE_VALIDATORS = 8;
 
     protected $applicationName = 'sylius';
+    protected $bundleName;
     protected $configDirectory = '/../Resources/config';
     protected $configFiles = array(
         'services',
@@ -68,9 +69,9 @@ abstract class AbstractResourceExtension extends Extension
 
         $config = $this->process($config, $container);
 
-        $loader = $this->getLoader($container, $config['loader']);
+        $loader = $this->getLoader($container, $this->getServiceLoader());
 
-        $this->loadConfigurationFile($this->configFiles, $loader, $config['loader']);
+        $this->loadConfigurationFile($this->configFiles, $loader, $this->getServiceLoader());
 
         if ($configure & self::CONFIGURE_DATABASE) {
             $this->loadDatabaseDriver($config, $loader, $container);
@@ -174,7 +175,7 @@ abstract class AbstractResourceExtension extends Extension
             throw new InvalidDriverException($driver, basename($bundle));
         }
 
-        $this->loadConfigurationFile(array(sprintf('driver/%s', $driver)), $loader, $config['loader']);
+        $this->loadConfigurationFile(array(sprintf('driver/%s', $driver)), $loader, $this->getServiceLoader());
 
         $container->setParameter($this->getAlias().'.driver', $driver);
         $container->setParameter($this->getAlias().'.driver.'.$driver, true);
@@ -238,5 +239,46 @@ abstract class AbstractResourceExtension extends Extension
     {
         // Override if needed.
         return $config;
+    }
+
+    /**
+     * Get service loader
+     *
+     * @return string
+     */
+    protected function getServiceLoader()
+    {
+        $reflector = new \ReflectionClass($this);
+        $namespace = $reflector->getNamespaceName();
+
+        if (null === $this->bundleName) {
+            $this->bundleName = strtr(
+                $namespace,
+                array(
+                    '\\Bundle\\'            => '',
+                    '\\'                    => '',
+                    'DependencyInjection'   => '',
+                )
+            );
+        }
+
+        $namespace = str_replace('DependencyInjection', '', $namespace);
+        $extension = sprintf('%s%s', $namespace, $this->bundleName);
+
+        $reflectionClass = new \ReflectionClass($extension);
+        $class = $reflectionClass->newInstanceWithoutConstructor();
+        $reflectionMethod = new \ReflectionMethod($extension, 'getServicesFileType');
+        $reflectionMethod->setAccessible(true);
+        $fileType = $reflectionMethod->invoke($class);
+
+        if (in_array($fileType, array(SyliusResourceBundle::SERVICES_XML, SyliusResourceBundle::SERVICES_YAML))) {
+            return $fileType;
+        }
+
+        throw new \InvalidArgumentException(sprintf(
+            'ServicesFileType "%s" not in list of available types: %s',
+            $fileType,
+            json_encode(array(SyliusResourceBundle::SERVICES_XML, SyliusResourceBundle::SERVICES_YAML))
+        ));
     }
 }
