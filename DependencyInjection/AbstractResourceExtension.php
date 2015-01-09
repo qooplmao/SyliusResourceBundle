@@ -206,9 +206,9 @@ abstract class AbstractResourceExtension extends Extension
             $configDirServices = sprintf('%s/services/%s.%s', $this->getConfigurationDirectory(), $filename, $fileType);
 
             if (file_exists($file = $configDir)) {
-                $loader->load($file);
+                return $loader->load($file);
             } elseif (file_exists($file = $configDirServices)) {
-                $loader->load($file);
+                return $loader->load($file);
             }
 
             throw new InvalidArgumentException(sprintf(
