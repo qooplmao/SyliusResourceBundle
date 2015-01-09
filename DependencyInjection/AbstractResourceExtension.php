@@ -210,17 +210,17 @@ abstract class AbstractResourceExtension extends Extension
             $configDirServices = sprintf('%s/services/%s.%s', $this->getConfigurationDirectory(), $filename, $fileType);
 
             if (file_exists($file = $configDir)) {
-                return $loader->load($file);
+                $loader->load($file);
             } elseif (file_exists($file = $configDirServices)) {
-                return $loader->load($file);
+                $loader->load($file);
+            } else {
+                throw new InvalidArgumentException(sprintf(
+                    'The service file "%s" can not be found in either "%s" or %s"',
+                    $filename,
+                    $configDir,
+                    $configDirServices
+                ));
             }
-
-            throw new InvalidArgumentException(sprintf(
-                'The service file "%s" can not be found in either "%s" or %s"',
-                $filename,
-                $configDir,
-                $configDirServices
-            ));
         }
     }
 
