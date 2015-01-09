@@ -19,6 +19,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -201,11 +202,16 @@ abstract class AbstractResourceExtension extends Extension
     protected function loadConfigurationFile(array $config, LoaderInterface $loader, $fileType)
     {
         foreach ($config as $filename) {
-            if (file_exists($file = sprintf('%s/%s.%s', $this->getConfigurationDirectory(), $filename, $fileType))) {
+            $configDir = sprintf('%s/%s.%s', $this->getConfigurationDirectory(), $filename, $fileType);
+            $configDirServices = sprintf('%s/services/%s.%s', $this->getConfigurationDirectory(), $filename, $fileType);
+
+            if (file_exists($file = $configDir)) {
                 $loader->load($file);
-            } elseif (file_exists($file = sprintf('%s/services/%s.%s', $this->getConfigurationDirectory(), $filename, $fileType))) {
+            } elseif (file_exists($file = $configDirServices)) {
                 $loader->load($file);
             }
+
+            throw new InvalidArgumentException(sprintf('The service file "%s" is not valid.', $file));
         }
     }
 
