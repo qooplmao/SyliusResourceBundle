@@ -211,7 +211,12 @@ abstract class AbstractResourceExtension extends Extension
                 $loader->load($file);
             }
 
-            throw new InvalidArgumentException(sprintf('The service file "%s" is not valid.', $file));
+            throw new InvalidArgumentException(sprintf(
+                'The service file "%s" can not be found in either "%s" or %s"',
+                $filename,
+                $configDir,
+                $configDirServices
+            ));
         }
     }
 
