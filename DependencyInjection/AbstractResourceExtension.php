@@ -176,7 +176,11 @@ abstract class AbstractResourceExtension extends Extension
             throw new InvalidDriverException($driver, basename($bundle));
         }
 
-        $this->loadConfigurationFile(array(sprintf('driver/%s', $driver)), $loader, $this->getServiceLoader());
+        try {
+            $this->loadConfigurationFile(array(sprintf('driver/%s', $driver)), $loader, $this->getServiceLoader());
+        } catch(InvalidArgumentException $e) {
+            // Do nothing
+        }
 
         $container->setParameter($this->getAlias().'.driver', $driver);
         $container->setParameter($this->getAlias().'.driver.'.$driver, true);
